@@ -2,6 +2,7 @@ import os
 import openai
 import tiktoken
 from dotenv import load_dotenv, find_dotenv
+from system_message import *
 
 _ = load_dotenv(find_dotenv())
 
@@ -12,8 +13,8 @@ client = openai.OpenAI()
 
 def get_completions(prompt, model="gpt-3.5-turbo", temperature=0.6, max_tokens=300):
     messages = [
-        {"role": "system", "content": "you are a chatbot who talks like a pirate and answers everything with more than 1000 words"},
-        {"role": "user", "content": prompt}]
+        {"role": "system", "content": system_messages},
+        {"role": "user", "content": f"{delimiter}{prompt}{delimiter}"}]
     response = client.chat.completions.create(
         model=model,
         messages=messages,
@@ -22,5 +23,17 @@ def get_completions(prompt, model="gpt-3.5-turbo", temperature=0.6, max_tokens=3
     )
     return response.choices[0].message.content
 
-print(get_completions('write a poem about sea ?', temperature=0.9, max_tokens=1000))
 
+
+
+
+try:
+    final_res = get_completions(f"""
+    by how much is the BlueWave Chromebook more expensive \
+    than the TechPro Desktop""", temperature=0.9, max_tokens=1000)
+    final_res = final_res.split(delimiter)[-1].strip()
+
+except:
+    final_res = "Sorry, There is an issue right now, Please try again later"
+
+print(final_res)
